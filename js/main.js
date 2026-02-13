@@ -1,81 +1,85 @@
-//initialize
+// ===============================
+// INITIALIZE FUNCTION
+// ===============================
 function initialize() {
+
 	var cityPop = [
-		{
-			city: 'Madison',
-			population: 233209
-		},
-		{
-			city: 'Milwaukee',
-			population: 594833
-		},
-		{
-			city: 'Green Bay',
-			population: 104057
-		},
-		{
-			city: 'Superior',
-			population: 27244
-		}
+		{ city: 'Madison', population: 233209 },
+		{ city: 'Milwaukee', population: 594833 },
+		{ city: 'Green Bay', population: 104057 },
+		{ city: 'Superior', population: 27244 }
 	];
 
-	//create the table element
+	// Create table element
 	var table = document.createElement("table");
 
-	//create a header row
+	// Create header row
 	var headerRow = document.createElement("tr");
 
-	//add the "City" and "Population" columns to the header row
-	headerRow.insertAdjacentHTML("beforeend", "<th>City</th><th>Population</th>")
+	// Add headers
+	headerRow.insertAdjacentHTML("beforeend", "<th>City</th><th>Population</th>");
 
-	//add the row to the table
 	table.appendChild(headerRow);
 
-	//loop to add a new row for each city
+	// Loop to add rows
 	for (var i = 0; i < cityPop.length; i++) {
-		//assign longer html strings to a variable
-		var rowHtml = "<tr><td>" + cityPop[i].city + "</td><td>" + cityPop[i].population + "</td></tr>";
-		//add the row's html string to the table
+
+		var rowHtml =
+			"<tr><td>" +
+			cityPop[i].city +
+			"</td><td>" +
+			cityPop[i].population +
+			"</td></tr>";
+
 		table.insertAdjacentHTML('beforeend', rowHtml);
 	}
 
+	// Add table to webpage
 	document.querySelector("#myDiv").appendChild(table);
 
+	// Add extra features
 	addColumns(cityPop);
 	addEvents();
 
-	// activity 4
+	// Load GeoJSON
 	debugAjax();
-
 }
 
-//add columns
+
+// ===============================
+// ADD CITY SIZE COLUMN
+// ===============================
 function addColumns(cityPop) {
 
 	document.querySelectorAll("tr").forEach(function (row, i) {
 
-		if (i == 0) {
+		if (i === 0) {
 
 			row.insertAdjacentHTML('beforeend', '<th>City Size</th>');
+
 		} else {
 
 			var citySize;
 
 			if (cityPop[i - 1].population < 100000) {
 				citySize = 'Small';
-
-			} else if (cityPop[i - 1].population < 500000) {
+			}
+			else if (cityPop[i - 1].population < 500000) {
 				citySize = 'Medium';
-
-			} else {
+			}
+			else {
 				citySize = 'Large';
-			};
-			row.insertAdjacentHTML('beforeend', '<td>' + citySize + '</td>');
-		};
-	});
-};
+			}
 
-//add events
+			row.insertAdjacentHTML('beforeend', '<td>' + citySize + '</td>');
+		}
+	});
+}
+
+
+// ===============================
+// ADD EVENTS TO TABLE
+// ===============================
 function addEvents() {
 
 	document.querySelector("table").addEventListener("mouseover", function () {
@@ -85,44 +89,64 @@ function addEvents() {
 		for (var i = 0; i < 3; i++) {
 
 			var random = Math.round(Math.random() * 255);
-
 			color += random;
 
 			if (i < 2) {
 				color += ",";
-
 			} else {
 				color += ")";
 			}
-		};
+		}
 
 		document.querySelector("table").style.color = color;
 	});
 
+
 	function clickme() {
-
 		alert('Hey, you clicked me!');
-	};
+	}
 
-	document.querySelector("table").addEventListener("click", clickme)
-};
+	document.querySelector("table").addEventListener("click", clickme);
+}
 
-// response function
-function debugCallback(response) {
-	document.querySelector("#myDiv").insertAdjacentHTML('beforeend', '<br>GeoJSON data:<br>' + JSON.stringify(response))
-};
 
-// use fetch function to load geojson file
+// ===============================
+// AJAX DEBUGGING SCRIPT
+// Loads GeoJSON and displays it
+// ===============================
+
+// Display GeoJSON data
+function debugCallback(myData) {
+
+	document.querySelector("#myDiv")
+		.insertAdjacentHTML(
+			'beforeend',
+			'<br>GeoJSON data:<br>' + JSON.stringify(myData)
+		);
+}
+
+
+// Load GeoJSON file
+// Installed the live server extension and used it to run the code, which allows fetch to work without CORS issues
 function debugAjax() {
 
 	fetch("data/MegaCities.geojson")
+
 		.then(function (response) {
 			return response.json();
 		})
-		.then(function (response) {
-			debugCallback(response);
-		})
-};
 
+		.then(function (data) {
+			debugCallback(data);
+		})
+
+		.catch(function (error) {
+			console.log("Error loading GeoJSON:", error);
+		});
+}
+
+
+// ===============================
+// RUN INITIALIZE WHEN PAGE LOADS
+// ===============================
 document.addEventListener('DOMContentLoaded', initialize);
-console.log("JavaScript is connected!");

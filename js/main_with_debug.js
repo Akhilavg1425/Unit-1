@@ -1,74 +1,151 @@
-var cityPop = [
-	{ 
-		city: 'Madison',
-		population: 233209
-	},
-	{
-		city: 'Milwaukee',
-		population: 594833
-	},
-	{
-		city: 'Green Bay',
-		population: 104057
-	},
-	{
-		city: 'Superior',
-		population: 27244
+// ===============================
+// INITIALIZE FUNCTION
+// ===============================
+function initialize() {
+
+	var cityPop = [
+		{ city: 'Madison', population: 233209 },
+		{ city: 'Milwaukee', population: 594833 },
+		{ city: 'Green Bay', population: 104057 },
+		{ city: 'Superior', population: 27244 }
+	];
+
+	// Create table element
+	var table = document.createElement("table");
+
+	// Create header row
+	var headerRow = document.createElement("tr");
+
+	// Add headers
+	headerRow.insertAdjacentHTML("beforeend", "<th>City</th><th>Population</th>");
+
+	table.appendChild(headerRow);
+
+	// Loop to add rows
+	for (var i = 0; i < cityPop.length; i++) {
+
+		var rowHtml =
+			"<tr><td>" +
+			cityPop[i].city +
+			"</td><td>" +
+			cityPop[i].population +
+			"</td></tr>";
+
+		table.insertAdjacentHTML('beforeend', rowHtml);
 	}
-];
 
-function addColumns(cityPop){
-    
-    document.querySelectorAll("tr").forEach(function(row, i){
+	// Add table to webpage
+	document.querySelector("#myDiv").appendChild(table);
 
-    	if (i == 0){
+	// Add extra features
+	addColumns(cityPop);
+	addEvents();
 
-    		row.insertAdjacntHTML('beforeend', '<th>City Size</th>');
-    	} else {
+	// Load GeoJSON
+	debugAjax();
+}
 
-    		var citySize;
 
-    		if (cityPop[i-1].population < 100000){
-    			citySize = 'Small';
+// ===============================
+// ADD CITY SIZE COLUMN
+// ===============================
+function addColumns(cityPop) {
 
-    		} else if (cityPop[i-1].population < 500000){
-    			citysize = 'Medium';
+	document.querySelectorAll("tr").forEach(function (row, i) {
 
-    		} else {
-    			citySize = 'Large';
-    		};
+		if (i === 0) {
 
-			row.insertAdjacntHTML = '<td' + citySize + '</td>';
-    	};
-    });
-};
+			row.insertAdjacentHTML('beforeend', '<th>City Size</th>');
 
-function addEvents(){
+		} else {
 
-	document.querySelector("table").addEventListener("mouseover", function(){
-		
+			var citySize;
+
+			if (cityPop[i - 1].population < 100000) {
+				citySize = 'Small';
+			}
+			else if (cityPop[i - 1].population < 500000) {
+				citySize = 'Medium';
+			}
+			else {
+				citySize = 'Large';
+			}
+
+			row.insertAdjacentHTML('beforeend', '<td>' + citySize + '</td>');
+		}
+	});
+}
+
+
+// ===============================
+// ADD EVENTS TO TABLE
+// ===============================
+function addEvents() {
+
+	document.querySelector("table").addEventListener("mouseover", function () {
+
 		var color = "rgb(";
 
-		for (var i=0; i<3; i++){
+		for (var i = 0; i < 3; i++) {
 
 			var random = Math.round(Math.random() * 255);
+			color += random;
 
-			color += "random";
-
-			if (i<2){
+			if (i < 2) {
 				color += ",";
-			
 			} else {
 				color += ")";
-		};
+			}
+		}
 
-		document.querySelector("table").color = color;
+		document.querySelector("table").style.color = color;
 	});
 
-	function clickme(){
 
+	function clickme() {
 		alert('Hey, you clicked me!');
-	};
+	}
 
-	document.querySelector("table").addEventListener("click", clickme)
-};
+	document.querySelector("table").addEventListener("click", clickme);
+}
+
+
+// ===============================
+// AJAX DEBUGGING SCRIPT
+// Loads GeoJSON and displays it
+// ===============================
+
+// Display GeoJSON data
+function debugCallback(myData) {
+
+	document.querySelector("#myDiv")
+		.insertAdjacentHTML(
+			'beforeend',
+			'<br>GeoJSON data:<br>' + JSON.stringify(myData)
+		);
+}
+
+
+// Load GeoJSON file
+function debugAjax() {
+
+	fetch("data/MegaCities.geojson")
+
+		.then(function (response) {
+			return response.json();
+		})
+
+		.then(function (data) {
+			debugCallback(data);
+		})
+
+		.catch(function (error) {
+			console.log("Error loading GeoJSON:", error);
+		});
+}
+
+
+// ===============================
+// RUN INITIALIZE WHEN PAGE LOADS
+// ===============================
+document.addEventListener('DOMContentLoaded', initialize);
